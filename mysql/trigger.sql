@@ -10,6 +10,7 @@ create table log_snape_config (
 `updated_columns` varchar(64) null comment 'columns updated ONLY for update operation',
 `data_old` text null comment 'concat columns for old value',
 `data_new` text null comment 'concat columns for new value',
+`user` varchar(128) not null comment 'the user from client',
 created_time timestamp not null default current_timestamp,
 primary key (id)
 ) engine=MyISAM default charset=utf8 comment='change log for snape config';
@@ -52,6 +53,7 @@ begin
 		(default, 'update', old.id, old.key, @updatedColumns,
 			concat(old.id, '\t', old.app, '\t', old.`key`, '\t', old.ext, '\t', old.`value`, '\t', old.enabled, '\t', old.description),
 			concat(new.id, '\t', new.app, '\t', new.`key`, '\t', new.ext, '\t', new.`value`, '\t', new.enabled, '\t', new.description),
+			user(),
 			default
 		);
 	else
@@ -69,6 +71,7 @@ begin
 	insert into log_snape_config values
 	(default, 'insert', new.id, new.key, null, null,
 		concat(new.id, '\t', new.app, '\t', new.`key`, '\t', new.ext, '\t', new.`value`, '\t', new.enabled, '\t', new.description),
+		user(),
 		default
 	);
 end$$
@@ -83,6 +86,7 @@ begin
 	(default, 'delete', old.id, old.key, null,
 		concat(old.id, '\t', old.app, '\t', old.`key`, '\t', old.ext, '\t', old.`value`, '\t', old.enabled, '\t', old.description),
 		null,
+		user(),
 		default
 	);
 end$$
